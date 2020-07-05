@@ -68,11 +68,20 @@ readData(aRepository, bRepository, cRepository);<br/>
 &nbsp;&nbsp;aRepository.save(a2);<br/>
 }<br/>
 <b>deleteData(){</b><br/>
-//we delete 1 A and 1 B related to another A<br/>
-A a1 = aRepository.findByMyString("myModifiedString1").get(0);<br/>
-aRepository.delete(a1);<br/>
-//we do not delete the B instance -> we want to remove that B instance from the A's list<br/>
-A a2 = aRepository.findByMyString("myModifiedString2").get(0);<br/>
-a2.getBSet().removeIf((B b) -> b.getMyInt() == 22);<br/>
-aRepository.save(a2);<br/>
+&nbsp;&nbsp;//we delete references to b3 and c2 in A's map<br/>
+&nbsp;&nbsp;C c2 = cRepository.findByC("c2").get(0);<br/>
+&nbsp;&nbsp;B b3 = bRepository.findByB("b3").get(0);<br/>
+&nbsp;&nbsp;//removing c2<br/>
+&nbsp;&nbsp;aRepository.findAll().forEach((a) -> {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;a.getMyMap().remove(c2);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;aRepository.save(a);<br/>
+&nbsp;&nbsp;});<br/>
+&nbsp;&nbsp;aRepository.findAll().forEach((a) -> {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;for(C c : a.getMyMap().keySet()) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if(a.getMyMap().get(c).equals(b3)) {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;a.getMyMap().remove(c);<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;}<br/>
+&nbsp;&nbsp;aRepository.save(a);<br/>
+&nbsp;&nbsp;});<br/>
 }<br/>
